@@ -1,0 +1,6 @@
+{
+    "extends": "yoho",
+    "env": {
+      "mocha": true
+    }
+}

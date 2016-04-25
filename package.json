@@ -1,0 +1,33 @@
+{
+  "name": "generator-mt",
+  "version": "0.0.1",
+  "description": "Webpack, PostCSS 前端构建脚手架",
+  "homepage": "http://miantiao.me",
+  "author": {
+    "name": "ccbikai",
+    "email": "ccbikai@qq.com",
+    "url": "http://miantiao.me"
+  },
+  "files": [
+    "generators"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "webpack",
+    "postcss",
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^0.22.0",
+    "chalk": "^1.0.0",
+    "yosay": "^1.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^2.8.0",
+    "eslint-config-yoho": "^0.10.0"
+  },
+  "repository": "ccbikai/generator-mt",
+  "scripts": {
+  },
+  "license": "MIT"
+}
