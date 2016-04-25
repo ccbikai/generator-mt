@@ -77,6 +77,9 @@ module.exports = yeoman.Base.extend({
     writing: function() {
         var self = this;
 
+        if (this.props.pkg.indexOf('jquery') === -1) {
+            this.props.jQuery = false; // 不选 jQuery 依赖包的时候，全局使用 jQuery 选项无效
+        }
         ['src', '.eslintrc', '.stylelintrc'].forEach(function(file) {
             self.fs.copy(
                 self.templatePath(file),
@@ -93,11 +96,12 @@ module.exports = yeoman.Base.extend({
     },
     install: function() {
         this.npmInstall(['-d']);
-        this.npmInstall(this.props.pkg, {
-            d: true,
-            saveDev: true
-        });
-        this.log(yosay(chalk.red('依赖安装完成，慢是因为你网络差!')));
+        if (this.props.pkg.length) {
+            this.npmInstall(this.props.pkg, {
+                d: true,
+                saveDev: true
+            });
+        }
     },
     end: function() {
         this.log(yosay(
