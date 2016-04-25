@@ -1,6 +1,6 @@
 {
   "name": "generator-mt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Webpack, PostCSS 前端构建脚手架",
   "homepage": "http://miantiao.me",
   "author": {

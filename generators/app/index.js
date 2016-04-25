@@ -9,7 +9,7 @@ module.exports = yeoman.Base.extend({
         var prompts;
 
         this.log(yosay(
-            '欢迎使用 ' + chalk.red('generator-mt')
+            '欢迎使用 ' + chalk.green('generator-mt')
         ));
         prompts = [{
             type: 'input',
@@ -29,7 +29,7 @@ module.exports = yeoman.Base.extend({
         }, {
             type: 'input',
             name: 'rem',
-            message: '1rem 等于多刷 px ?',
+            message: '1rem 等于多少 px ?',
             default: 40
         }, {
             type: 'input',
@@ -92,16 +92,16 @@ module.exports = yeoman.Base.extend({
         });
     },
     install: function() {
-
-        // this.npmInstall(['-d']);
+        this.npmInstall(['-d']);
         this.npmInstall(this.props.pkg, {
             d: true,
             saveDev: true
         });
+        this.log(yosay(chalk.red('依赖安装完成，慢是因为你网络差!')));
     },
     end: function() {
         this.log(yosay(
-            chalk.green('Happy Coding')
+            chalk.green('Happy Coding!')
         ));
     }
 });
