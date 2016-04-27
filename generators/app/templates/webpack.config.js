@@ -16,6 +16,7 @@ var fs = require('fs'),
 
 var distDir = './assets'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
 var isProduction = process.env.NODE_ENV === 'production';
+var useHash = <% if (!useHash) { %>false<% } else { %>isProduction<% } %>;
 var spriteHash = _.random(11111111, 99999999); // 每次 build ，雪碧图使用随机数做 hash
 var spritesConfig = {
     basePath: distDir + '/dist',
@@ -127,7 +128,7 @@ module.exports = {
     output: {
         path: distDir + '/dist',
         publicPath: '/dist',
-        filename: isProduction ? '[name].[hash:8].js' : '[name].js'
+        filename: useHash ? '[name].[hash:8].js' : '[name].js'
     },
     module: {
         loaders: [{
@@ -147,7 +148,7 @@ module.exports = {
             name: 'libs',
             minChunks: 2 // 如果包被require两次以上，自动合并到 libs 目录
         }),
-        new ExtractTextPlugin(isProduction ? '[name].[hash:8].css' : '[name].css')
+        new ExtractTextPlugin(useHash ? '[name].[hash:8].css' : '[name].css')
     ],
     devServer: {
         host: '0.0.0.0',
@@ -184,12 +185,17 @@ if (isProduction) {
         new webpack.BannerPlugin('<%= banner %>', {
             entryOnly: true
         }),
-        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.optimize.OccurenceOrderPlugin()
+    );
+} else {
+    module.exports.devtool = '#source-map';
+}
+
+if (useHash) {
+    module.exports.plugins.push(
         new AssetsPlugin({
             fullPath: false,
             prettyPrint: true
         })
     );
-} else {
-    module.exports.devtool = '#source-map';
 }

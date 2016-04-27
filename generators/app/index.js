@@ -61,6 +61,16 @@ module.exports = yeoman.Base.extend({
             message: '使用 ES6 ?',
             default: true
         }, {
+            type: 'confirm',
+            name: 'precommit',
+            message: '强制代码检查 ?',
+            default: true
+        }, {
+            type: 'confirm',
+            name: 'useHash',
+            message: '使用文件 Hash ?',
+            default: false
+        }, {
             type: 'input',
             name: 'banner',
             message: 'Banner 文字:',
@@ -96,6 +106,9 @@ module.exports = yeoman.Base.extend({
     },
     install: function() {
         this.npmInstall(['-d']);
+        if (this.props.precommit) {
+            this.props.pkg.push('husky');
+        }
         if (this.props.pkg.length) {
             this.npmInstall(this.props.pkg, {
                 d: true,
