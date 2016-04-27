@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "eslint": "^2.8.0",
-    "eslint-config-yoho": "^0.10.0"
+    "eslint-config-yoho": "^1.0.0"
   },
   "repository": "ccbikai/generator-mt",
   "scripts": {
