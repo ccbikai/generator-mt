@@ -10,14 +10,12 @@
     "lint-css": "node_modules/.bin/stylelint --config .stylelintrc `git diff --cached --name-only --diff-filter=ACM | grep .css$`",
     "precommit": "npm run lint-js && npm run lint-css"
   },
-  "repository": "http://miaotiao.me",
   "keywords": [
-    "ghost",
     "postcss",
     "webpack"
   ],
   "author": "ccbikai",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "assets-webpack-plugin": "^3.4.0",
