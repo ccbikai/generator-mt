@@ -14,13 +14,13 @@ var fs = require('fs'),
     _ = require('lodash'),
     hbs = require('handlebars');
 
-var distDir = './assets'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
+var distDir = './<%= distDir %>'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
 var isProduction = process.env.NODE_ENV === 'production';
 var useHash = <% if (!useHash) { %>false<% } else { %>isProduction<% } %>;
 var spriteHash = _.random(11111111, 99999999); // 每次 build ，雪碧图使用随机数做 hash
 var spritesConfig = {
-    basePath: distDir + '/dist',
-    stylesheetPath: distDir + '/dist',
+    basePath: distDir + '/build',
+    stylesheetPath: distDir + '/build',
     spritePath: distDir + '/sprites',
     spritesmith: {
         padding: 4
@@ -57,7 +57,7 @@ var copyConfig = {
         return template;
     },
     relativePath: function() {
-        return distDir + '/dist'; // CSS文件存放地址
+        return distDir + '/build'; // CSS文件存放地址
     },
     inputPath: function(decl) {
         if (!decl.source) {
@@ -126,8 +126,8 @@ module.exports = {
         index: ['./src/js/index.js', './src/css/style.css']
     },
     output: {
-        path: distDir + '/dist',
-        publicPath: '/dist',
+        path: distDir + '/build',
+        publicPath: '/build',
         filename: useHash ? '[name].[hash:8].js' : '[name].js'
     },
     module: {

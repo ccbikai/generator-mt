@@ -28,6 +28,11 @@ module.exports = yeoman.Base.extend({
             default: 2222
         }, {
             type: 'input',
+            name: 'distDir',
+            message: '静态资源目录:',
+            default: 'dist'
+        }, {
+            type: 'input',
             name: 'rem',
             message: '1rem 等于多少 px ?',
             default: 40
