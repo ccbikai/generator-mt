@@ -20,7 +20,7 @@ module.exports = yeoman.Base.extend({
             type: 'input',
             name: 'description',
             message: '项目介绍:',
-            default: '前端代码目录'
+            default: '前端代码'
         }, {
             type: 'input',
             name: 'port',
