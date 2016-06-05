@@ -95,7 +95,7 @@ module.exports = yeoman.Base.extend({
         if (this.props.pkg.indexOf('jquery') === -1) {
             this.props.jQuery = false; // 不选 jQuery 依赖包的时候，全局使用 jQuery 选项无效
         }
-        ['src', '.eslintrc', '.stylelintrc'].forEach(function(file) {
+        ['src', '.eslintrc', '.eslintignore', '.stylelintrc', '.stylelintignore'].forEach(function(file) {
             self.fs.copy(
                 self.templatePath(file),
                 self.destinationPath(file)

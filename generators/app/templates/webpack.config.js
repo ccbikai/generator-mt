@@ -15,7 +15,7 @@ var fs = require('fs'),
     hbs = require('handlebars');
 
 var distDir = './<%= distDir %>'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
-var isProduction = process.env.NODE_ENV === 'production';
+var isProduction = process.env.npm_lifecycle_event === 'build';
 var useHash = <% if (!useHash) { %>false<% } else { %>isProduction<% } %>;
 var spriteHash = _.random(11111111, 99999999); // 每次 build ，雪碧图使用随机数做 hash
 var spritesConfig = {
@@ -94,10 +94,10 @@ var copyConfig = {
     }
 };
 
-function postcssPlugin() {
+function postcssPlugin(webPack) {
     return [
         postcssImport({
-            addDependencyTo: webpack
+            addDependencyTo: webPack
         }),
         precss,
         pxtorem({

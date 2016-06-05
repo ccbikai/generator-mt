@@ -1,4 +1,3 @@
 {
-  "extends": "stylelint-config-yoho",
-  "ignoreFiles": "**/dist/**.css"
+  "extends": "stylelint-config-yoho"
 }
