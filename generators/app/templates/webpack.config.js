@@ -1,43 +1,46 @@
-var fs = require('fs'),
-    path = require('path'),
-    webpack = require('webpack'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin'),
-    CleanWebpackPlugin = require('clean-webpack-plugin'),
-    AssetsPlugin = require('assets-webpack-plugin'),
-    precss = require('precss'),
-    cssnano = require('cssnano'),
-    postcssImport = require('postcss-import'),
-    pxtorem = require('postcss-pxtorem'),
-    sprites = require('postcss-sprites'),
-    copy = require('postcss-copy'),
-    Imagemin = require('imagemin'),
-    _ = require('lodash'),
-    hbs = require('handlebars');
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const AssetsPlugin = require('assets-webpack-plugin');
+const precss = require('precss');
+const cssnano = require('cssnano');
+const postcssImport = require('postcss-import');
+const pxtorem = require('postcss-pxtorem');
+const sprites = require('postcss-sprites');
+const copy = require('postcss-copy');
+const imagemin = require('imagemin');
+const _ = require('lodash');
+const hbs = require('handlebars');
 
-var distDir = './<%= distDir %>'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
-var isProduction = process.env.npm_lifecycle_event === 'build';
-var useHash = <% if (!useHash) { %>false<% } else { %>isProduction<% } %>;
-var spriteHash = _.random(11111111, 99999999); // 每次 build ，雪碧图使用随机数做 hash
-var spritesConfig = {
-    basePath: distDir + '/build',
-    stylesheetPath: distDir + '/build',
-    spritePath: distDir + '/sprites',
+const distDir = './<%= distDir %>'; // 生成的文件存放地址，每次 build 之前先会删除，再 build
+const isProduction = process.env.npm_lifecycle_event === 'build';
+const useHash = <% if (!useHash) { %>false<% } else { %>isProduction<% } %>;
+const spriteHash = _.random(11111111, 99999999); // 每次 build ，雪碧图使用随机数做 hash
+
+const spritesConfig = {
+    basePath: `${distDir}/build`,
+    stylesheetPath: `${distDir}/build`,
+    spritePath: `${distDir}/sprites`,
     spritesmith: {
         padding: 4
     },
-    filterBy: function(fileMeta) {
+    filterBy(fileMeta) {
         return /src\/sprites/.test(fileMeta.path) ? Promise.resolve() : Promise.reject(); // 只生成 sprites 目录的雪碧图
     },
-    groupBy: function(fileMeta) {
-        var filePath = fileMeta.path.replace(__dirname, ''),
-            group = path.dirname(filePath).split('/').pop(1); // 根据目录分组，防止合并后的图片太大
+    groupBy(fileMeta) {
+        const filePath = fileMeta.path.replace(__dirname, '');
+        const group = path.dirname(filePath).split('/').pop(1); // 根据目录分组，防止合并后的图片太大
 
         fileMeta.retina = true; // 强制所有图片都是用二倍图
+        fileMeta.ratio = 2;
         return group ? Promise.resolve(group) : Promise.reject();
     },
     hooks: {
-        onSaveSpritesheet: function(opts, groups) {
-            var output;
+        onSaveSpritesheet(opts, groups) {
+            let output;
 
             groups = groups || [];
             output = isProduction ? [groups, spriteHash, 'png'] : [groups, 'png'];
@@ -45,61 +48,55 @@ var spritesConfig = {
         }
     }
 };
-var copyConfig = {
+const copyConfig = {
     src: './src',
     dest: distDir,
-    template: function(fileMeta) {
-        var template = path.join(fileMeta.path, fileMeta.name + '.' + fileMeta.ext);
+    template(fileMeta) {
+        let template = path.join(fileMeta.path, `${fileMeta.name}.${fileMeta.ext}`);
 
         if (isProduction) {
-            template = path.join(fileMeta.path, fileMeta.name + '.' + fileMeta.hash.slice(0, 8) + '.' + fileMeta.ext);
+            template = path.join(fileMeta.path, `${fileMeta.name}.${fileMeta.hash.slice(0, 8)}.${fileMeta.ext}`);
         }
         return template;
     },
-    relativePath: function() {
-        return distDir + '/build'; // CSS文件存放地址
+    relativePath() {
+        return `${distDir}/build`; // CSS文件存放地址
     },
-    inputPath: function(decl) {
+    inputPath(decl) {
         if (!decl.source) {
             return path.resolve('src/css'); // postcss-sprites 添加的雪碧图没有源文件，伪造一个
         }
         return path.dirname(decl.source.input.file);
     },
     transform: function fileProcess(fileMeta) {
-        return new Promise(function(resolve, reject) {
-            if (['jpg', 'png', 'gif'].indexOf(fileMeta.ext) !== -1) {
-                new Imagemin() // 图片自动压缩
-                    .src(fileMeta.contents)
-                    .use(Imagemin.jpegtran({
-                        progressive: true
-                    }))
-                    .use(Imagemin.optipng({
-                        optimizationLevel: 3
-                    }))
-                    .use(Imagemin.gifsicle())
-                    .run((err, files) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        fileMeta.contents = files[0].contents;
-                        resolve(fileMeta);
-                    });
-            } else {
-                resolve(fileMeta);
-            }
-        });
+        if (['jpg', 'png', 'gif'].indexOf(fileMeta.ext) !== -1) {
+            return imagemin([fileMeta.absolutePath], {
+                plugins: [
+
+                    // imageminMozjpeg({targa: true}),
+                    // imageminPngquant({quality: '65-80'})
+                ]
+            }).then(files => {
+                fileMeta.contents = files[0].data;
+                return fileMeta;
+            });
+        } else {
+            return Promise.resolve(fileMeta);
+        }
     },
-    ignore: function(fileMeta) {
-        return /src\/sprites/.test(fileMeta.absolutePath); // 忽略雪碧图
+    ignore(fileMeta) {
+        return /src\/sprites/.test(fileMeta.absolutePath) || /src\/svg/.test(fileMeta.absolutePath); // 忽略雪碧图
     }
 };
 
-function postcssPlugin(webPack) {
+function postcssPlugin(toWebpack) {
     return [
         postcssImport({
-            addDependencyTo: webPack
+            addDependencyTo: toWebpack
         }),
         precss,
+        sprites.default(spritesConfig),
+        copy(copyConfig),
         pxtorem({
             rootValue: 100,
             unitPrecision: 5, // 保留5位小数字
@@ -115,9 +112,7 @@ function postcssPlugin(webPack) {
                 add: true,
                 browsers: ['> 1%']
             }
-        }),
-        sprites.default(spritesConfig),
-        copy(copyConfig)
+        })
     ];
 }
 
@@ -126,7 +121,7 @@ module.exports = {
         index: ['./src/js/index.js', './src/css/style.css']
     },
     output: {
-        path: distDir + '/build',
+        path: `${distDir}/build`,
         publicPath: '/build',
         filename: useHash ? '[name].[hash:8].js' : '[name].js'
     },
